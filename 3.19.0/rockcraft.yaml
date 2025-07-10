@@ -1,0 +1,45 @@
+# upstream: https://github.com/litmuschaos/litmus/blob/master/chaoscenter/authentication/Dockerfile
+
+name: litmuschaos-authserver
+summary: Petrified litmuschaos-authserver.
+description: Litmus authentication server
+version: "3.19.0"
+base: ubuntu@24.04
+license: Apache-2.0
+services:
+  authserver:
+    command: bin/server
+    override: replace
+    # there's no point enabling it: it will never work out-of-the-box given that it needs several
+    # other components and configurations to function properly.
+    startup: disabled
+platforms:
+  amd64:
+parts:
+  litmuschaos-authserver:
+    plugin: go
+    source: https://github.com/litmuschaos/litmus
+    source-type: git
+    source-tag: "3.19.0"
+    source-depth: 1
+    build-snaps:
+      - go/1.22/stable
+    override-build: |
+      cd chaoscenter/authentication
+      CGO_ENABLED=0 go build -o "${CRAFT_PART_INSTALL}/bin/server" -v ./api/
+    build-environment:
+      - CGO_ENABLED: "0"
+    stage:
+      - bin/server
+  ca-certs:
+    plugin: nil
+    overlay-packages: [ca-certificates]
+  deb-security-manifest:
+    plugin: nil
+    after:
+      - litmuschaos-authserver
+      - ca-certs
+    override-prime: |
+      set -x
+      mkdir -p $CRAFT_PRIME/usr/share/rocks/
+      (echo "# os-release" && cat /etc/os-release && echo "# dpkg-query" && dpkg-query --admindir=$CRAFT_PRIME/var/lib/dpkg/ -f '${db:Status-Abbrev},${binary:Package},${Version},${source:Package},${Source:Version}\n' -W) > $CRAFT_PRIME/usr/share/rocks/dpkg.query

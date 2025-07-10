@@ -1,0 +1,27 @@
+name: Update rock
+
+on:
+  workflow_dispatch: {}
+  schedule:
+    - cron: '0 0 * * *'
+
+jobs:
+  build:
+    uses: canonical/observability/.github/workflows/rock-update.yaml@v1
+    secrets: inherit
+    with:
+      rock-name: litmuschaos-authserver
+      source-repo: litmuschaos/litmus
+      # litmuschaos is a monorepo, so we'll need a custom script to update the golang version
+      update-script: |
+        go_version="$(grep -Po "^go \K(\S+)" "$application_src/chaoscenter/authentication/go.mod")" \
+        # Delete the Go dependency and add the updated one
+        yq -i 'del(.parts.litmuschaos-authserver.build-snaps.[] | select(. == "go/*"))' \
+        "$rockcraft_yaml"
+        # Snap channels are named after major.minor only, so cut the go version to that format
+        go_major_minor="$(echo "$go_version" | sed -E "s/([0-9]+\.[0-9]+).*/\1/")"
+        go_v="$go_major_minor" yq -i \
+        '.parts.litmuschaos-authserver.build-snaps += "go/"+strenv(go_v)+"/stable"' \
+        "$rockcraft_yaml"
+      check-go: false
+    
