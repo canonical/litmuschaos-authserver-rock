@@ -12,3 +12,4 @@ jobs:
     secrets: inherit
     with:
       rock-name: litmuschaos-authserver
+      risk-track: edge
