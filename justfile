@@ -28,5 +28,5 @@ run version=latest_version: (push-to-registry version)
   kgoss edit -i localhost:32000/${rock_name}-dev:${version}
 
 # FIXME: add integration tests cfr. https://github.com/canonical/litmuschaos-authserver-rock/issues/1
-# test version=latest_version: (push-to-registry version)
+test version=latest_version: (push-to-registry version)
 # kgoss run -i localhost:32000/${rock_name}-dev:${version}
