@@ -10,9 +10,7 @@ services:
   authserver:
     command: bin/server
     override: replace
-    # there's no point enabling it: it will never work out-of-the-box given that it needs several
-    # other components and configurations to function properly.
-    startup: disabled
+    startup: enabled
 platforms:
   amd64:
 parts:
