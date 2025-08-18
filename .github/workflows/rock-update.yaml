@@ -4,6 +4,10 @@ on:
   workflow_dispatch: {}
   schedule:
     - cron: '0 0 * * *'
+  push:
+    branches:
+      - fix-script
+    
 
 jobs:
   build:
@@ -14,6 +18,7 @@ jobs:
       source-repo: litmuschaos/litmus
       # litmuschaos is a monorepo, so we'll need a custom script to update the golang version
       update-script: |
+        ls "$GITHUB_WORKSPACE/application_src"
         go_version="$(grep -Po "^go \K(\S+)" "$GITHUB_WORKSPACE/application_src/chaoscenter/authentication/go.mod")" \
         # Delete the Go dependency and add the updated one
         yq -i 'del(.parts.litmuschaos-authserver.build-snaps.[] | select(. == "go/*"))' \
