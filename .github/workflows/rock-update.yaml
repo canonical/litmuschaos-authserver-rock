@@ -14,7 +14,7 @@ jobs:
       source-repo: litmuschaos/litmus
       # litmuschaos is a monorepo, so we'll need a custom script to update the golang version
       update-script: |
-        go_version="$(grep -Po "^go \K(\S+)" "$GITHUB_WORKSPACE/application_src/chaoscenter/authentication/go.mod")" \
+        go_version="$(grep -Po "^go \K(\S+)" "$GITHUB_WORKSPACE/application-src/chaoscenter/authentication/go.mod")" \
         # Delete the Go dependency and add the updated one
         yq -i 'del(.parts.litmuschaos-authserver.build-snaps.[] | select(. == "go/*"))' \
         "$rockcraft_yaml"
