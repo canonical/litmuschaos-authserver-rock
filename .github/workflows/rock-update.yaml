@@ -14,6 +14,8 @@ jobs:
       source-repo: litmuschaos/litmus
       # litmuschaos is a monorepo, so we'll need a custom script to update the golang version
       update-script: |
+        # When editing the script, make sure to escape all dollar signs to prevent variables from being evaluated
+        # at the time of saving the script to a file, unless this is the desired behavior. 
         go_version="\$(grep -Po "^go \K(\S+)" "$GITHUB_WORKSPACE/application-src/chaoscenter/authentication/go.mod")"
         # Delete the Go dependency and add the updated one
         yq -i 'del(.parts.litmuschaos-authserver.build-snaps.[] | select(. == "go/*"))' \
