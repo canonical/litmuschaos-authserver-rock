@@ -7,7 +7,7 @@ version: "3.20.0"
 base: ubuntu@24.04
 license: Apache-2.0
 services:
-  authserver:
+  auth:
     command: bin/server
     override: replace
     startup: enabled
