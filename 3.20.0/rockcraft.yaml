@@ -25,10 +25,13 @@ parts:
     override-build: |
       cd chaoscenter/authentication
       CGO_ENABLED=0 go build -o "${CRAFT_PART_INSTALL}/bin/server" -v ./api/
+      # write the workload version into a VERSION file
+      echo "$(craftctl get version)" > "${CRAFT_PART_INSTALL}/VERSION"
     build-environment:
       - CGO_ENABLED: "0"
     stage:
       - bin/server
+      - VERSION
   ca-certs:
     plugin: nil
     overlay-packages: [ca-certificates]
