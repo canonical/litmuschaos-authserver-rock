@@ -27,6 +27,29 @@ clean version=latest_version:
 run version=latest_version: (push-to-registry version)
   kgoss edit -i localhost:32000/${rock_name}-dev:${version}
 
-# FIXME: add integration tests cfr. https://github.com/canonical/litmuschaos-authserver-rock/issues/1
 test version=latest_version: (push-to-registry version)
-# kgoss run -i localhost:32000/${rock_name}-dev:${version}
+  # litmuschaos-authserver needs a MongoDB database to work. deploy one
+  kubectl delete service mongo --ignore-not-found
+  kubectl delete pod mongo --ignore-not-found
+
+  kubectl run mongo \
+    --image=mongo:7 \
+    --env="MONGO_INITDB_ROOT_USERNAME=root" \
+    --env="MONGO_INITDB_ROOT_PASSWORD=password" \
+    --port=27017
+  kubectl expose pod mongo \
+    --port=27017 \
+    --name=mongo
+
+  kgoss run -i "localhost:32000/litmuschaos-authserver-dev:$version" \
+    -e VERSION="$version" \
+    -e DB_USER=root \
+    -e DB_PASSWORD=password \
+    -e REST_PORT=3000 \
+    -e GRPC_PORT=3030 \
+    -e DB_SERVER=mongodb://mongo:27017 \
+    -e ADMIN_USERNAME=admin \
+    -e ADMIN_PASSWORD=password
+    
+  kubectl delete service mongo --ignore-not-found
+  kubectl delete pod mongo --ignore-not-found
