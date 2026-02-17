@@ -21,7 +21,7 @@ parts:
     source-tag: "3.25.0"
     source-depth: 1
     build-snaps:
-      - go/1.24/stable
+      - go/1.24/candidate
     override-build: |
       cd chaoscenter/authentication
       CGO_ENABLED=0 go build -o "${CRAFT_PART_INSTALL}/bin/server" -v ./api/
